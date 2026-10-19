@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>С Днём Рождения, Наталия! 🎀✨</title>
+
+  <!-- Open Graph для Telegram и WhatsApp -->
+  <meta property="og:title" content="С Днём Рождения, Наталия! 🎀✨">
+  <meta property="og:description" content="Тебе особенный подарок ко дню рождения (27 лет)! Открой интерактивную открытку 🍓💖">
+  <meta property="og:image" content="assets/kitty-avatar.png">
+  <meta name="theme-color" content="#ffd1dc">
+
+  <link rel="icon" type="image/png" href="assets/bow-logo.png">
+
+  <!-- Шрифты Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Fredoka:wght@500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Стили -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+  <!-- Фоновые парящие стикеры -->
+  <div class="ambient-bg" id="ambient-bg">
+    <div class="floating-sticker" style="top: 8%; left: 8%; font-size: 1.8rem; animation-delay: 0s;">🍓</div>
+    <div class="floating-sticker" style="top: 15%; right: 10%; font-size: 1.6rem; animation-delay: 1.5s;">✨</div>
+    <div class="floating-sticker" style="top: 45%; left: 4%; font-size: 1.5rem; animation-delay: 3s;">🎀</div>
+    <div class="floating-sticker" style="top: 60%; right: 6%; font-size: 2rem; animation-delay: 2s;">💖</div>
+    <div class="floating-sticker" style="top: 82%; left: 12%; font-size: 1.7rem; animation-delay: 4s;">🌸</div>
+    <div class="floating-sticker" style="top: 85%; right: 14%; font-size: 1.8rem; animation-delay: 2.5s;">🍰</div>
+  </div>
+
+  <!-- Главный контейнер приложения -->
+  <main class="app-container">
+
+    <!-- Верхняя панель -->
+    <header class="header-bar">
+      <div class="brand-badge">
+        <img src="assets/bow-logo.png" alt="Bow" id="badge-icon">
+        <span id="badge-text">Наталия • 27</span>
+      </div>
+      <button class="btn-icon" id="btn-sound" title="Включить/выключить звук" aria-label="Звук">
+        🎵
+      </button>
+    </header>
+
+    <!-- Индикатор шагов -->
+    <div class="step-dots" id="step-dots">
+      <div class="dot active" data-step="1"></div>
+      <div class="dot" data-step="2"></div>
+      <div class="dot" data-step="3"></div>
+      <div class="dot" data-step="4"></div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- ЭКРАН 1: Интерактивный подарок             -->
+    <!-- ========================================== -->
+    <section class="screen active" id="screen-1">
+      <div>
+        <h1 class="screen-title" id="s1-title">Тебе пришла секретная посылка! 🎀</h1>
+        <p class="screen-subtitle" id="s1-subtitle">Коснись коробки 3 раза, чтобы сорвать бант и открыть сюрприз</p>
+      </div>
+
+      <div class="gift-area" id="gift-box-btn">
+        <div class="gift-aura-glow"></div>
+        
+        <!-- Сюрприз, выпрыгивающий из коробки (Живой анимированный котик) -->
+        <div class="gift-popping-kitty" id="gift-popping-kitty">
+          <img src="assets/kitty-waving.gif" alt="Kitty Waving" style="width: 140px; height: 140px; object-fit: contain;">
+          <div class="kitty-pop-tag">С 27-летием, Наталия! 🎀</div>
+        </div>
+
+        <img src="assets/gift-box.png" alt="Подарок для Наталии" class="gift-img" id="gift-img">
+        <div class="gift-tap-hint" id="gift-hint">Нажми на меня! 🎁</div>
+      </div>
+
+      <div class="tap-progress">
+        <span class="tap-heart" id="heart-1">💖</span>
+        <span class="tap-heart" id="heart-2">💖</span>
+        <span class="tap-heart" id="heart-3">💖</span>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- ЭКРАН 2: Полароидные карточки              -->
+    <!-- ========================================== -->
+    <section class="screen" id="screen-2">
+      <div>
+        <h1 class="screen-title" id="s2-title">Как начиналась и жила эта история... 🌸</h1>
+        <p class="screen-subtitle" id="s2-subtitle">Смахни карточку влево или вправо, чтобы листать дальше ✨</p>
+      </div>
+
+      <div class="polaroid-deck" id="polaroid-deck">
+        <!-- Карточки генерируются скриптом из config.js -->
+      </div>
+
+      <div>
+        <div class="deck-nav-hint" id="deck-counter">Карточка 1 из 3</div>
+        <button class="btn-kawaii" id="btn-to-cake" style="margin-top: 12px; display: none;">
+          Загадать желание! 🎂✨
+        </button>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- ЭКРАН 3: Торт со свечами «27»              -->
+    <!-- ========================================== -->
+    <section class="screen" id="screen-3">
+      <div>
+        <h1 class="screen-title" id="s3-title">Загадай самое заветное желание!</h1>
+        <p class="screen-subtitle" id="s3-subtitle">Подуй в микрофон телефона или нажми на свечки, чтобы задуть их</p>
+      </div>
+
+      <div class="cake-stage" id="cake-stage">
+        <!-- Аура и мерцающие искорки вокруг торта -->
+        <div class="cake-aura-glow"></div>
+        <div class="sparkle-orbit sparkle-orbit-cake">
+          <span class="orbit-sparkle s1">✨</span>
+          <span class="orbit-sparkle s2">🍓</span>
+          <span class="orbit-sparkle s3">✨</span>
+          <span class="orbit-sparkle s4">💖</span>
+        </div>
+
+        <img src="assets/cake.png" alt="Праздничный торт" class="cake-img kawaii-floating-cake" id="cake-img" title="Коснись торта! 🍓">
+        
+        <!-- Свечи-цифры «2» и «7» -->
+        <div class="candles-container">
+          <!-- Свеча 2 -->
+          <div class="candle-number" id="candle-2" title="Нажми, чтобы задуть">
+            <div class="candle-wick"></div>
+            <div class="flame" id="flame-2"></div>
+            2
+          </div>
+          <!-- Свеча 7 -->
+          <div class="candle-number" id="candle-7" title="Нажми, чтобы задуть">
+            <div class="candle-wick"></div>
+            <div class="flame" id="flame-7"></div>
+            7
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="mic-status-box" id="mic-status">
+          💨 Слушаем дуновение в микрофон...
+        </div>
+        <button class="btn-kawaii" id="btn-to-question" style="margin-top: 14px; display: none;">
+          Открыть финал! 🍓✨
+        </button>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- ЭКРАН 4: Финальный вопрос и Победный салют  -->
+    <!-- ========================================== -->
+    <section class="screen" id="screen-4">
+      
+      <!-- Под-экран: Вопрос с убегающей кнопкой -->
+      <div id="question-wrapper" style="width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 100%;">
+        <div>
+          <div class="question-avatar kitty-interactive" id="kitty-question-avatar" title="Погладь котика! 🎀">
+            <div class="kitty-aura-glow"></div>
+            <div class="sparkle-orbit sparkle-orbit-kitty">
+              <span class="orbit-sparkle k1">✨</span>
+              <span class="orbit-sparkle k2">🎀</span>
+              <span class="orbit-sparkle k3">💖</span>
+            </div>
+            <img src="assets/kitty-sparkle-heart.gif" alt="Китти с блестящим сердечком" class="kitty-animated" id="kitty-heart-img">
+          </div>
+          <h1 class="screen-title" id="s4-title">Отпразднуем твои 27 самым сладким образом? 🍓</h1>
+          <p class="screen-subtitle">Сделай правильный выбор 🎀</p>
+        </div>
+
+        <div class="decision-box" id="decision-box">
+          <button class="btn-yes" id="btn-yes">Да, конечно! 💖🎉</button>
+          <button class="btn-no" id="btn-no">Нет</button>
+        </div>
+      </div>
+
+      <!-- Под-экран: Торжественный финал (показывается после нажатия "Да") -->
+      <div class="celebration-view" id="celebration-view">
+        <div class="celebration-avatar-box kitty-interactive" id="kitty-celebration-avatar" title="Погладь котика! 🎀">
+          <div class="kitty-aura-glow"></div>
+          <div class="sparkle-orbit sparkle-orbit-kitty">
+            <span class="orbit-sparkle k1">✨</span>
+            <span class="orbit-sparkle k2">👑</span>
+            <span class="orbit-sparkle k3">💖</span>
+          </div>
+          <img src="assets/kitty-cheerleader.gif" alt="Happy Kitty Dancing" class="kitty-animated celebration-kitty-img" style="width: 140px; height: 140px; object-fit: contain;">
+        </div>
+
+        <h1 class="screen-title" style="color: var(--primary-pink); font-size: 1.6rem;" id="final-title">
+          УРА! ТЫ САМАЯ ЛУЧШАЯ! 🎀✨
+        </h1>
+        <p class="screen-subtitle" id="final-subtitle">
+          Пусть этот 27-й год принесёт бесконечное счастье, любовь и исполнение каждой твоей мечты!
+        </p>
+
+        <!-- Интерактивный генератор «27 причин восхищаться Наталией» -->
+        <div class="compliment-widget" id="compliment-box" title="Нажми, чтобы увидеть следующий комплимент">
+          <div class="compliment-header" id="compliment-num">Причина восхищаться #1 из 27 🍓</div>
+          <div class="compliment-text" id="compliment-text">Твоя лучезарная и искренняя улыбка ✨</div>
+          <div class="compliment-hint">🍓 Нажми на клубничку, чтобы открыть ещё!</div>
+        </div>
+
+        <!-- Главная кнопка кульминации -->
+        <div class="action-row">
+          <button class="btn-kawaii btn-hugs-kisses" id="btn-hugs-kisses">
+            <span class="btn-icon-emoji">🤗</span>
+            <span>Получить обнимашки и целовашки</span>
+            <span class="btn-icon-emoji">💋</span>
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ================================================================= -->
+  <!-- ОВЕРЛЕЙ ЗАВЕРШЕНИЯ ПОЗДРАВЛЕНИЯ: ОБНИМАШКИ И ЦЕЛОВАШКИ (STITCH)   -->
+  <!-- ================================================================= -->
+  <div class="hugs-overlay" id="hugs-overlay" aria-hidden="true">
+    <div class="hugs-backdrop" id="hugs-backdrop"></div>
+    <div class="hugs-modal-card modal-centered" id="hugs-modal-card">
+      <button class="hugs-modal-close" id="btn-close-hugs" aria-label="Закрыть">✕</button>
+      
+      <!-- Декоративная ленточка Stitch -->
+      <div class="hugs-badge">
+        <span>✨</span>
+        <span id="hugs-badge-text">СЛАДКИЙ ФИНАЛ • 27 ЛЕТ</span>
+        <span>✨</span>
+      </div>
+
+      <!-- Главный заголовок -->
+      <h2 class="hugs-title" id="hugs-title">Обнимашки &amp; Целовашки! 🧸💋</h2>
+      <p class="hugs-message" id="hugs-message">
+        Самые крепкие, тёплые обнимашки и сладкие целовашки для тебя, любимка! Пусть твои 27 будут наполнены бесконечной заботой, любовью и абсолютным счастьем! 💕✨
+      </p>
+
+      <!-- Центральная анимированная витрина с котиком и сердечком -->
+      <div class="hugs-kitten-showcase">
+        <div class="hugs-corner-bow left">🎀</div>
+        <div class="hugs-corner-bow right">🎀</div>
+        <div class="hugs-kitty-wrapper hug-pulse-anim">
+          <div class="hugs-kitty-aura"></div>
+          <img src="assets/kitty-sparkle-heart.gif" alt="Kitty Hugging Heart" class="hugs-kitty-img" id="hugs-kitty-img">
+          <span class="floating-kiss-stamp stamp-1">💋</span>
+          <span class="floating-kiss-stamp stamp-2">💕</span>
+          <span class="floating-kiss-stamp stamp-3">✨</span>
+        </div>
+
+        <!-- Счётчик нежности -->
+        <div class="hugs-counter-pill">
+          <div class="counter-left">
+            <span class="counter-heart">💖</span>
+            <span class="counter-title">Счётчик нежности:</span>
+          </div>
+          <div class="counter-value-box">
+            <span class="counter-number" id="hugs-counter-num">1000</span>
+            <span class="counter-max">/ 1000 💕</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Бенто-бейджи уюта -->
+      <div class="hugs-bento-badges">
+        <div class="bento-badge">
+          <span class="bento-icon">🍓</span>
+          <span class="bento-text">100% Уют</span>
+        </div>
+        <div class="bento-badge">
+          <span class="bento-icon">🐾</span>
+          <span class="bento-text">Мягкие лапки</span>
+        </div>
+        <div class="bento-badge">
+          <span class="bento-icon">💌</span>
+          <span class="bento-text">Любовь навсегда</span>
+        </div>
+      </div>
+
+      <!-- Кнопка добавления ещё обнимашек -->
+      <button class="btn-kawaii btn-more-hugs bouncy-btn" id="btn-more-hugs">
+        <span>Ещё обнимашек!</span>
+        <span class="emoji-jump">💖</span>
+        <span class="emoji-kiss">💋</span>
+      </button>
+
+      <div class="hugs-end-sign">С любовью и нежностью в твой особенный день! 🎀</div>
+    </div>
+  </div>
+
+  </main>
+
+  <!-- Скрытый холст для генерации открытки-картинки на скачивание -->
+  <canvas id="export-canvas" width="800" height="1000" style="display: none;"></canvas>
+
+  <!-- Холст конфетти -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Скрипты приложения -->
+  <script src="config.js"></script>
+  <script src="audio.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
