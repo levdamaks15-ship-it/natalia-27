@@ -588,9 +588,9 @@ p.screen-subtitle {
 }
 
 /* Координаты свечей (выверены под торт из Stitch) */
-#candle-1 { left: 41.5%; top: 22%; }
-#candle-2 { left: 50%; top: 20.5%; }
-#candle-3 { left: 58.5%; top: 22.5%; }
+#candle-1 { left: 43.0%; top: 20.0%; }
+#candle-2 { left: 50.2%; top: 17.5%; }
+#candle-3 { left: 56.8%; top: 20.0%; }
 
 .flame-flicker {
   position: relative;
@@ -621,24 +621,52 @@ p.screen-subtitle {
   pointer-events: none;
 }
 
+/* Остывающий тлеющий уголёк на потушенном фитиле */
+.flame-ember {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #ff4500;
+  box-shadow: 0 0 6px #ff4500, 0 0 10px #ff0000;
+  opacity: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.flame-ember.ember-active {
+  animation: emberCooldown 2.4s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
+}
+
+@keyframes emberCooldown {
+  0% { opacity: 1; transform: translateX(-50%) scale(1.5); background: #ff7700; box-shadow: 0 0 8px #ff7700, 0 0 12px #ff2200; }
+  25% { opacity: 0.95; transform: translateX(-50%) scale(1.2); background: #ff3300; box-shadow: 0 0 6px #ff3300; }
+  60% { opacity: 0.65; transform: translateX(-50%) scale(0.9); background: #991100; box-shadow: 0 0 3px #550000; }
+  100% { opacity: 0; transform: translateX(-50%) scale(0.5); background: #222222; box-shadow: none; }
+}
+
 .flame-smoke-puff {
   position: absolute;
-  top: -24px;
+  top: -16px;
   left: 50%;
   transform: translateX(-50%);
   font-size: 1.6rem;
   opacity: 0;
   pointer-events: none;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.12));
 }
 
 .flame-smoke-puff.puff-active {
-  animation: smokeRisePuff 1.4s ease-out forwards;
+  animation: smokeRisePuff 1.5s ease-out forwards;
 }
 
 @keyframes smokeRisePuff {
   0% { opacity: 0.95; transform: translate(-50%, 0) scale(0.6); }
-  50% { opacity: 0.6; transform: translate(-50%, -24px) scale(1.2) rotate(8deg); }
-  100% { opacity: 0; transform: translate(-50%, -46px) scale(1.8) rotate(-12deg); }
+  50% { opacity: 0.65; transform: translate(-50%, -24px) scale(1.2) rotate(8deg); }
+  100% { opacity: 0; transform: translate(-50%, -48px) scale(1.8) rotate(-14deg); }
 }
 
 /* Анимированный шлейф ветра */

@@ -277,6 +277,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('smoke-2'),
     document.getElementById('smoke-3')
   ];
+  const emberEls = [
+    document.getElementById('ember-1'),
+    document.getElementById('ember-2'),
+    document.getElementById('ember-3')
+  ];
   const windTrail = document.getElementById('wind-swipe-trail');
   const candlesBadge = document.getElementById('candles-count-badge');
   const swipeTrack = document.getElementById('swipe-wind-track');
@@ -313,6 +318,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Гасим пламя
     if (flameEls[index]) {
       flameEls[index].classList.add('extinguished');
+    }
+
+    // Запускаем остывающий уголёк на фитильке
+    if (emberEls[index]) {
+      emberEls[index].classList.remove('ember-active');
+      void emberEls[index].offsetWidth;
+      emberEls[index].classList.add('ember-active');
     }
 
     // Запускаем дымок
