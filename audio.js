@@ -11,12 +11,13 @@ class BirthdayAudioEngine {
     this.micStream = null;
     this.analyser = null;
     this.isListening = false;
+    this.bgmAudio = null;
     this.bgmPlaying = false;
     this.bgmInterval = null;
     this.bgmStep = 0;
   }
 
-  // Инициализация AudioContext по первому клику/тапу (требование браузеров)
+  // Инициализация AudioContext и фонового плеера по первому клику/тапу (требование браузеров)
   initContext() {
     if (!this.ctx) {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -26,6 +27,15 @@ class BirthdayAudioEngine {
     }
     if (this.ctx && this.ctx.state === 'suspended') {
       this.ctx.resume();
+    }
+    if (!this.bgmAudio) {
+      this.bgmAudio = document.getElementById('bgm-audio');
+      if (!this.bgmAudio) {
+        this.bgmAudio = new Audio('assets/happy_birthday_music_box.mp3');
+        this.bgmAudio.id = 'bgm-audio';
+        this.bgmAudio.loop = true;
+      }
+      this.bgmAudio.volume = 0.4;
     }
   }
 
@@ -349,19 +359,58 @@ class BirthdayAudioEngine {
     }
   }
 
-  // 6. Милая фоновая мелодия (Lofi Music Box)
+  // 6. Нежная праздничная фоновая мелодия (Happy Birthday Music Box)
   startBgm() {
-    if (this.bgmPlaying) return;
+    if (this.isMuted) return;
     this.initContext();
-    if (!this.ctx) return;
-
     this.bgmPlaying = true;
-    // Милая гамма мелодии Kawaii Music Box
-    const melody = [
-      523.25, 659.25, 783.99, 659.25, 880.00, 783.99, 659.25, 523.25,
-      587.33, 659.25, 698.46, 659.25, 587.33, 523.25, 493.88, 523.25
-    ];
 
+    if (this.bgmAudio) {
+      this.bgmAudio.volume = 0.4;
+      const playPromise = this.bgmAudio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.warn("Фоновое аудио ожидает жеста пользователя:", err);
+          // Фолбэк на синтезатор, если аудиофайлу что-то помешало
+          this.startFallbackProceduralBgm();
+        });
+      }
+    } else {
+      this.startFallbackProceduralBgm();
+    }
+  }
+
+  stopBgm() {
+    this.bgmPlaying = false;
+    if (this.bgmAudio) {
+      this.bgmAudio.pause();
+    }
+    if (this.bgmInterval) {
+      clearInterval(this.bgmInterval);
+      this.bgmInterval = null;
+    }
+  }
+
+  toggleMute() {
+    this.isMuted = !this.isMuted;
+    if (this.isMuted) {
+      this.stopBgm();
+    } else {
+      this.startBgm();
+    }
+    return this.isMuted;
+  }
+
+  // Резервный синтезатор на случай блокировки загрузки mp3 файла
+  startFallbackProceduralBgm() {
+    if (this.bgmInterval || !this.ctx) return;
+    // Ноты Happy Birthday to You:
+    const melody = [
+      261.63, 261.63, 293.66, 261.63, 349.23, 329.63,
+      261.63, 261.63, 293.66, 261.63, 392.00, 349.23,
+      261.63, 261.63, 523.25, 440.00, 349.23, 329.63, 293.66,
+      466.16, 466.16, 440.00, 349.23, 392.00, 349.23
+    ];
     this.bgmInterval = setInterval(() => {
       if (!this.bgmPlaying || this.isMuted || !this.ctx) return;
       const freq = melody[this.bgmStep % melody.length];
@@ -381,25 +430,7 @@ class BirthdayAudioEngine {
 
       osc.start(now);
       osc.stop(now + 0.48);
-    }, 420);
-  }
-
-  stopBgm() {
-    this.bgmPlaying = false;
-    if (this.bgmInterval) {
-      clearInterval(this.bgmInterval);
-      this.bgmInterval = null;
-    }
-  }
-
-  toggleMute() {
-    this.isMuted = !this.isMuted;
-    if (this.isMuted) {
-      this.stopBgm();
-    } else {
-      this.startBgm();
-    }
-    return this.isMuted;
+    }, 440);
   }
 }
 
