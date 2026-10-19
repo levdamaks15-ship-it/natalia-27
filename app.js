@@ -14,8 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentStep = 1;
   let tapCount = 0;
   let activeCardIndex = 0;
-  let flame2Lit = true;
-  let flame7Lit = true;
+  let candlesLit = [true, true, true]; // 3 свечи на праздничном торте
   let complimentIdx = 0;
 
   // Элементы навигации
@@ -54,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Особые действия при входе на шаг
     if (step === 3) {
-      initStep3Mic();
+      onEnterStep3();
     }
   }
 
@@ -261,59 +260,142 @@ document.addEventListener('DOMContentLoaded', () => {
   renderPolaroids();
 
   // =========================================================================
-  // ЭКРАН 3: Торт со свечами «27»
+  // ЭКРАН 3: Торт с 3 свечами и свайпом ветра (Stitch UI)
   // =========================================================================
-  const flame2 = document.getElementById('flame-2');
-  const flame7 = document.getElementById('flame-7');
-  const candle2 = document.getElementById('candle-2');
-  const candle7 = document.getElementById('candle-7');
-  const micStatus = document.getElementById('mic-status');
+  const candleEls = [
+    document.getElementById('candle-1'),
+    document.getElementById('candle-2'),
+    document.getElementById('candle-3')
+  ];
+  const flameEls = [
+    document.getElementById('flame-1'),
+    document.getElementById('flame-2'),
+    document.getElementById('flame-3')
+  ];
+  const smokeEls = [
+    document.getElementById('smoke-1'),
+    document.getElementById('smoke-2'),
+    document.getElementById('smoke-3')
+  ];
+  const windTrail = document.getElementById('wind-swipe-trail');
+  const candlesBadge = document.getElementById('candles-count-badge');
+  const swipeTrack = document.getElementById('swipe-wind-track');
+  const swipeKnob = document.getElementById('swipe-wind-knob');
+  const swipeProgress = document.getElementById('swipe-wind-progress');
+  const wishStatus = document.getElementById('wish-status-text');
   const btnToQuestion = document.getElementById('btn-to-question');
+  const cakeStage = document.getElementById('cake-stage');
+  const cakeImg = document.getElementById('cake-img');
+  const candlesOverlay = document.getElementById('candles-overlay');
 
-  function extinguishCandle(which) {
-    if (which === 2 && flame2Lit) {
-      flame2Lit = false;
-      flame2.classList.add('extinguished');
-      spawnSmoke(candle2);
-      window.birthdayAudio.playExtinguish();
-    } else if (which === 7 && flame7Lit) {
-      flame7Lit = false;
-      flame7.classList.add('extinguished');
-      spawnSmoke(candle7);
-      window.birthdayAudio.playExtinguish();
+  function updateCandlesBadge() {
+    const litCount = candlesLit.filter(Boolean).length;
+    if (!candlesBadge) return;
+    if (litCount === 0) {
+      candlesBadge.textContent = "✨ Все 3 задуты! ✨";
+      candlesBadge.style.background = "#e8fdf0";
+      candlesBadge.style.color = "#15803d";
+      candlesBadge.style.borderColor = "#86efac";
+    } else {
+      candlesBadge.textContent = `${litCount} / 3 горят`;
+      candlesBadge.style.background = "#fff0f5";
+      candlesBadge.style.color = "#7a5761";
+      candlesBadge.style.borderColor = "#ffd1dc";
+    }
+  }
+
+  function extinguishCandle(index) {
+    if (index < 0 || index >= candlesLit.length) return;
+    if (!candlesLit[index]) return;
+
+    candlesLit[index] = false;
+
+    // Гасим пламя
+    if (flameEls[index]) {
+      flameEls[index].classList.add('extinguished');
     }
 
+    // Запускаем дымок
+    if (smokeEls[index]) {
+      smokeEls[index].classList.remove('puff-active');
+      void smokeEls[index].offsetWidth;
+      smokeEls[index].classList.add('puff-active');
+    }
+
+    // Звук и тактильный отклик
+    window.birthdayAudio.playExtinguish();
+
+    // Обновляем бейдж и проверяем завершение
+    updateCandlesBadge();
     checkAllCandlesBlown();
   }
 
-  function spawnSmoke(parentEl) {
-    const smoke = document.createElement('div');
-    smoke.className = 'smoke-puff';
-    smoke.textContent = '💨';
-    parentEl.appendChild(smoke);
-    setTimeout(() => smoke.remove(), 1200);
-  }
-
   function checkAllCandlesBlown() {
-    if (!flame2Lit && !flame7Lit) {
-      window.birthdayAudio.stopMic();
-      micStatus.textContent = "✨ Желание загадано! Свечи задуты! ✨";
-      micStatus.style.background = "#e8fdf0";
-      micStatus.style.color = "#15803d";
-      micStatus.style.borderColor = "#86efac";
+    if (candlesLit.every(lit => !lit)) {
+      if (wishStatus) {
+        if (cfg.screen3?.candlesBlownText) {
+          wishStatus.textContent = cfg.screen3.candlesBlownText;
+        }
+        wishStatus.style.display = 'block';
+      }
 
-      btnToQuestion.style.display = 'inline-flex';
+      if (btnToQuestion) {
+        btnToQuestion.style.display = 'inline-flex';
+        btnToQuestion.classList.remove('pulse-highlight');
+        void btnToQuestion.offsetWidth;
+        btnToQuestion.classList.add('pulse-highlight');
+      }
 
-      // Праздничный салют
+      // Обновляем слайдер в победное состояние
+      if (swipeKnob) {
+        swipeKnob.innerHTML = '<span>✨</span>';
+        swipeKnob.style.background = 'linear-gradient(135deg, #ffd700 0%, #ff85a2 100%)';
+      }
+      if (swipeProgress) {
+        swipeProgress.style.width = '100%';
+      }
+      const swipeText = document.querySelector('.swipe-wind-text');
+      if (swipeText) {
+        swipeText.textContent = "🎉 Свечи задуты! Желание загадано!";
+        swipeText.style.color = "#15803d";
+      }
+
+      // Праздничный салют конфетти
       if (window.confetti) {
         window.confetti({
-          particleCount: 90,
-          spread: 70,
-          origin: { y: 0.55 },
-          colors: ['#ffd700', '#ff69b4', '#ffffff']
+          particleCount: 100,
+          spread: 75,
+          origin: { y: 0.52 },
+          colors: ['#ffd700', '#ff69b4', '#ffffff', '#ff1493', '#7cfc00']
         });
       }
+
       window.birthdayAudio.playChime();
+    }
+  }
+
+  // Запуск шлейфа ветра при свайпе
+  function triggerWindTrail() {
+    if (!windTrail) return;
+    windTrail.classList.remove('wind-active');
+    void windTrail.offsetWidth;
+    windTrail.classList.add('wind-active');
+    setTimeout(() => {
+      windTrail.classList.remove('wind-active');
+    }, 650);
+  }
+
+  // Плавный последовательный свайп задувания (волной: свеча 1 -> 2 -> 3)
+  function blowCandlesSequence() {
+    triggerWindTrail();
+    let delay = 0;
+    for (let i = 0; i < 3; i++) {
+      if (candlesLit[i]) {
+        setTimeout(() => {
+          extinguishCandle(i);
+        }, delay);
+        delay += 140;
+      }
     }
   }
 
@@ -335,37 +417,177 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Интерактивный клик/тап по торту: желейный отскок + клубнички
-  const cakeImg = document.getElementById('cake-img');
-  cakeImg.addEventListener('click', (e) => {
-    cakeImg.classList.remove('jelly-wobble');
-    void cakeImg.offsetWidth;
-    cakeImg.classList.add('jelly-wobble');
-    window.birthdayAudio.playSquish();
-    const rect = cakeImg.getBoundingClientRect();
-    const x = e.clientX || (rect.left + rect.width / 2);
-    const y = e.clientY || (rect.top + rect.height / 2);
-    spawnFlyingParticles(x, y, ['🍓', '✨', '🍰', '🍓']);
+  if (cakeImg) {
+    cakeImg.addEventListener('click', (e) => {
+      cakeImg.classList.remove('jelly-wobble');
+      void cakeImg.offsetWidth;
+      cakeImg.classList.add('jelly-wobble');
+      window.birthdayAudio.playSquish();
+      const rect = cakeImg.getBoundingClientRect();
+      const x = e.clientX || (rect.left + rect.width / 2);
+      const y = e.clientY || (rect.top + rect.height / 2);
+      spawnFlyingParticles(x, y, ['🍓', '✨', '🍰', '🍓']);
+    });
+  }
+
+  // Ручной тап по отдельным свечам
+  candleEls.forEach((el, idx) => {
+    if (el) {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        extinguishCandle(idx);
+      });
+    }
   });
 
-  // Ручной тап по свечам
-  candle2.addEventListener('click', () => extinguishCandle(2));
-  candle7.addEventListener('click', () => extinguishCandle(7));
+  // ==========================================
+  // Свайп по слайдеру (Stitch wind track)
+  // ==========================================
+  if (swipeTrack && swipeKnob) {
+    let isKnobDragging = false;
+    let trackStartX = 0;
 
-  // Инициализация микрофона
-  function initStep3Mic() {
-    window.birthdayAudio.startMicBlowDetector(() => {
-      // При обнаружении дуновения гасим обе свечи
-      if (flame2Lit) extinguishCandle(2);
-      setTimeout(() => {
-        if (flame7Lit) extinguishCandle(7);
-      }, 150);
-    }).then((started) => {
-      if (started) {
-        micStatus.textContent = "💨 Микрофон активен! Подуй в телефон!";
-      } else {
-        micStatus.textContent = "👆 Нажми на пламя свечек, чтобы задуть их!";
+    const startKnobDrag = (clientX) => {
+      if (candlesLit.every(lit => !lit)) return;
+      isKnobDragging = true;
+      trackStartX = clientX;
+      swipeKnob.style.transition = 'none';
+      if (swipeProgress) swipeProgress.style.transition = 'none';
+      triggerWindTrail();
+    };
+
+    const moveKnobDrag = (clientX) => {
+      if (!isKnobDragging) return;
+      const trackRect = swipeTrack.getBoundingClientRect();
+      const knobWidth = swipeKnob.offsetWidth || 38;
+      const maxDist = trackRect.width - knobWidth - 6;
+      if (maxDist <= 0) return;
+
+      let deltaX = clientX - trackRect.left - knobWidth / 2;
+      deltaX = Math.max(0, Math.min(deltaX, maxDist));
+
+      const ratio = deltaX / maxDist; // 0.0 .. 1.0
+
+      swipeKnob.style.left = `${3 + deltaX}px`;
+      if (swipeProgress) {
+        swipeProgress.style.width = `${Math.min(100, Math.max(10, ratio * 100))}%`;
       }
+
+      // Постепенное тушение свечей по мере протяжки слайдера
+      if (ratio >= 0.22 && candlesLit[0]) {
+        extinguishCandle(0);
+      }
+      if (ratio >= 0.52 && candlesLit[1]) {
+        extinguishCandle(1);
+      }
+      if (ratio >= 0.82 && candlesLit[2]) {
+        extinguishCandle(2);
+      }
+    };
+
+    const endKnobDrag = () => {
+      if (!isKnobDragging) return;
+      isKnobDragging = false;
+
+      // Если все свечи задуты, фиксируем кнопку в конце
+      if (candlesLit.every(lit => !lit)) {
+        const trackRect = swipeTrack.getBoundingClientRect();
+        const knobWidth = swipeKnob.offsetWidth || 38;
+        const maxDist = Math.max(0, trackRect.width - knobWidth - 6);
+        swipeKnob.style.transition = 'left 0.25s ease';
+        swipeKnob.style.left = `${3 + maxDist}px`;
+      } else {
+        // Возвращаем ручку назад, если еще остались горящие свечи
+        swipeKnob.style.transition = 'left 0.35s cubic-bezier(0.16, 1, 0.3, 1)';
+        swipeKnob.style.left = '3px';
+        if (swipeProgress) {
+          swipeProgress.style.transition = 'width 0.35s ease';
+          swipeProgress.style.width = '10%';
+        }
+      }
+    };
+
+    // Touch на слайдере
+    swipeTrack.addEventListener('touchstart', (e) => startKnobDrag(e.touches[0].clientX), { passive: true });
+    window.addEventListener('touchmove', (e) => { if (isKnobDragging) moveKnobDrag(e.touches[0].clientX); }, { passive: true });
+    window.addEventListener('touchend', endKnobDrag);
+
+    // Mouse на слайдере
+    swipeKnob.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      startKnobDrag(e.clientX);
     });
+    window.addEventListener('mousemove', (e) => { if (isKnobDragging) moveKnobDrag(e.clientX); });
+    window.addEventListener('mouseup', endKnobDrag);
+  }
+
+  // ==========================================
+  // Прямой горизонтальный свайп по торту/свечам
+  // ==========================================
+  const cakeTarget = candlesOverlay || cakeStage;
+  if (cakeTarget) {
+    let cakeTouchStartX = 0;
+    let cakeTouchStartY = 0;
+    let cakeSwiping = false;
+
+    const startCakeSwipe = (x, y) => {
+      cakeTouchStartX = x;
+      cakeTouchStartY = y;
+      cakeSwiping = true;
+    };
+
+    const moveCakeSwipe = (x, y) => {
+      if (!cakeSwiping) return;
+      const dx = x - cakeTouchStartX;
+      const dy = Math.abs(y - cakeTouchStartY);
+
+      // Если горизонтальный свайп вправо > 45px и наклон < 60px
+      if (dx > 45 && dy < 60) {
+        cakeSwiping = false;
+        blowCandlesSequence();
+
+        // Также анимируем слайдер до конца для синхронизации
+        if (swipeKnob && swipeTrack) {
+          const trackRect = swipeTrack.getBoundingClientRect();
+          const knobWidth = swipeKnob.offsetWidth || 38;
+          const maxDist = Math.max(0, trackRect.width - knobWidth - 6);
+          swipeKnob.style.transition = 'left 0.45s cubic-bezier(0.16, 1, 0.3, 1)';
+          swipeKnob.style.left = `${3 + maxDist}px`;
+          if (swipeProgress) {
+            swipeProgress.style.transition = 'width 0.45s ease';
+            swipeProgress.style.width = '100%';
+          }
+        }
+      }
+    };
+
+    const endCakeSwipe = () => {
+      cakeSwiping = false;
+    };
+
+    cakeTarget.addEventListener('touchstart', (e) => {
+      startCakeSwipe(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+
+    cakeTarget.addEventListener('touchmove', (e) => {
+      moveCakeSwipe(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+
+    cakeTarget.addEventListener('touchend', endCakeSwipe);
+
+    // Мышиный свайп по торту
+    cakeTarget.addEventListener('mousedown', (e) => {
+      startCakeSwipe(e.clientX, e.clientY);
+    });
+    cakeTarget.addEventListener('mousemove', (e) => {
+      moveCakeSwipe(e.clientX, e.clientY);
+    });
+    cakeTarget.addEventListener('mouseup', endCakeSwipe);
+  }
+
+  // При входе на шаг 3:
+  function onEnterStep3() {
+    updateCandlesBadge();
   }
 
   btnToQuestion.addEventListener('click', () => {

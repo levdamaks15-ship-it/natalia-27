@@ -109,12 +109,13 @@
     </section>
 
     <!-- ========================================== -->
-    <!-- ЭКРАН 3: Торт со свечами «27»              -->
+    <!-- ========================================== -->
+    <!-- ЭКРАН 3: Торт с 3 свечами и свайпом ветра  -->
     <!-- ========================================== -->
     <section class="screen" id="screen-3">
       <div>
         <h1 class="screen-title" id="s3-title">Загадай самое заветное желание!</h1>
-        <p class="screen-subtitle" id="s3-subtitle">Подуй в микрофон телефона или нажми на свечки, чтобы задуть их</p>
+        <p class="screen-subtitle" id="s3-subtitle">Смахни вправо по свечам, чтобы задуть их 💨</p>
       </div>
 
       <div class="cake-stage" id="cake-stage">
@@ -129,26 +130,52 @@
 
         <img src="assets/cake.png" alt="Праздничный торт" class="cake-img kawaii-floating-cake" id="cake-img" title="Коснись торта! 🍓">
         
-        <!-- Свечи-цифры «2» и «7» -->
-        <div class="candles-container">
-          <!-- Свеча 2 -->
-          <div class="candle-number" id="candle-2" title="Нажми, чтобы задуть">
-            <div class="candle-wick"></div>
-            <div class="flame" id="flame-2"></div>
-            2
+        <!-- Оверлей 3 свечей и пламени (калибровка под торт) -->
+        <div class="candles-overlay-3" id="candles-overlay">
+          <!-- Свеча 1 (слева) -->
+          <div class="candle-item-3" id="candle-1" data-candle="1" title="Нажми или смахни">
+            <div class="flame-smoke-puff" id="smoke-1">💨</div>
+            <div class="flame-flicker flame-1" id="flame-1"></div>
           </div>
-          <!-- Свеча 7 -->
-          <div class="candle-number" id="candle-7" title="Нажми, чтобы задуть">
-            <div class="candle-wick"></div>
-            <div class="flame" id="flame-7"></div>
-            7
+          <!-- Свеча 2 (в центре) -->
+          <div class="candle-item-3" id="candle-2" data-candle="2" title="Нажми или смахни">
+            <div class="flame-smoke-puff" id="smoke-2">💨</div>
+            <div class="flame-flicker flame-2" id="flame-2"></div>
           </div>
+          <!-- Свеча 3 (справа) -->
+          <div class="candle-item-3" id="candle-3" data-candle="3" title="Нажми или смахни">
+            <div class="flame-smoke-puff" id="smoke-3">💨</div>
+            <div class="flame-flicker flame-3" id="flame-3"></div>
+          </div>
+        </div>
+
+        <!-- Анимированный шлейф ветра при свайпе -->
+        <div class="wind-swipe-trail" id="wind-swipe-trail">
+          <span class="wind-icon">💨</span>
+          <div class="wind-line"></div>
+          <span class="wind-sparkle">✨</span>
+        </div>
+      </div>
+
+      <!-- Контроллер свайпа (Stitch UI) -->
+      <div class="cake-swipe-card" id="cake-swipe-card">
+        <div class="swipe-hint-header">
+          <span class="swipe-hint-title">🌬️ Смахни, чтобы подуть! 💨</span>
+          <span class="candles-badge" id="candles-count-badge">3 / 3 горят</span>
+        </div>
+        <!-- Интерактивный трек для свайпа -->
+        <div class="swipe-wind-track" id="swipe-wind-track">
+          <div class="swipe-wind-progress" id="swipe-wind-progress"></div>
+          <div class="swipe-wind-knob candy-btn" id="swipe-wind-knob">
+            <span>💨</span>
+          </div>
+          <div class="swipe-wind-text">Проведи вправо, чтобы задуть →</div>
         </div>
       </div>
 
       <div>
-        <div class="mic-status-box" id="mic-status">
-          💨 Слушаем дуновение в микрофон...
+        <div class="wish-status-box" id="wish-status-text" style="display: none;">
+          ✨ Желание отправлено во Вселенную! Оно обязательно сбудется! ✨
         </div>
         <button class="btn-kawaii" id="btn-to-question" style="margin-top: 14px; display: none;">
           Открыть финал! 🍓✨

@@ -567,97 +567,229 @@ p.screen-subtitle {
 }
 
 /* Свечи-цифры */
-.candles-container {
+/* Оверлей 3 свечей на торте */
+.candles-overlay-3 {
   position: absolute;
-  top: 10px;
-  display: flex;
-  gap: 22px;
+  inset: 0;
   z-index: 15;
+  pointer-events: auto;
   animation: cakeFloat 4s ease-in-out infinite alternate;
 }
 
-.candle-number {
-  position: relative;
-  background: linear-gradient(180deg, #ffffff 0%, #ffe4ec 100%);
-  border: 2px solid #ff85a2;
-  border-radius: 12px;
+.candle-item-3 {
+  position: absolute;
   width: 44px;
   height: 56px;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Fredoka', sans-serif;
-  font-size: 2rem;
+}
+
+/* Координаты свечей (выверены под торт из Stitch) */
+#candle-1 { left: 41.5%; top: 22%; }
+#candle-2 { left: 50%; top: 20.5%; }
+#candle-3 { left: 58.5%; top: 22.5%; }
+
+.flame-flicker {
+  position: relative;
+  width: 18px;
+  height: 28px;
+  background: radial-gradient(ellipse at bottom, #ffffff 0%, #ffd700 45%, #ff4500 85%, transparent 100%);
+  border-radius: 50% 50% 20% 20%;
+  filter: drop-shadow(0 0 10px #ff9e00) drop-shadow(0 0 18px #ff4500);
+  animation: flickerFlame 1.2s infinite ease-in-out;
+  transform-origin: center bottom;
+  transition: opacity 0.35s, transform 0.35s;
+}
+
+.flame-1 { animation-delay: 0.1s; }
+.flame-2 { animation-delay: 0s; width: 20px; height: 30px; }
+.flame-3 { animation-delay: 0.25s; }
+
+@keyframes flickerFlame {
+  0%, 100% { transform: scale(1) rotate(-1deg); opacity: 0.95; }
+  25% { transform: scale(1.08, 0.92) rotate(2.5deg); opacity: 1; }
+  50% { transform: scale(0.94, 1.05) rotate(-2deg); opacity: 0.9; }
+  75% { transform: scale(1.05, 0.96) rotate(1.5deg); opacity: 0.98; }
+}
+
+.flame-flicker.extinguished {
+  opacity: 0 !important;
+  transform: scale(0.15) translateY(-12px) !important;
+  pointer-events: none;
+}
+
+.flame-smoke-puff {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.6rem;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.flame-smoke-puff.puff-active {
+  animation: smokeRisePuff 1.4s ease-out forwards;
+}
+
+@keyframes smokeRisePuff {
+  0% { opacity: 0.95; transform: translate(-50%, 0) scale(0.6); }
+  50% { opacity: 0.6; transform: translate(-50%, -24px) scale(1.2) rotate(8deg); }
+  100% { opacity: 0; transform: translate(-50%, -46px) scale(1.8) rotate(-12deg); }
+}
+
+/* Анимированный шлейф ветра */
+.wind-swipe-trail {
+  position: absolute;
+  top: 18%;
+  left: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 25;
+  transition: opacity 0.2s;
+}
+
+.wind-swipe-trail.wind-active {
+  opacity: 1;
+  animation: windSlide 0.6s ease-out forwards;
+}
+
+@keyframes windSlide {
+  0% { transform: translateX(-40%); opacity: 0.3; }
+  50% { opacity: 0.95; }
+  100% { transform: translateX(40%); opacity: 0; }
+}
+
+.wind-line {
+  height: 3px;
+  width: 80px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
+  border-radius: 9999px;
+}
+
+/* Контроллер свайпа (Stitch UI) */
+.cake-swipe-card {
+  width: 100%;
+  max-width: 330px;
+  margin: 12px auto 0;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(10px);
+  border: 1.5px solid #ffd1dc;
+  border-radius: 22px;
+  padding: 10px 14px 12px;
+  box-shadow: 0 8px 24px rgba(255, 105, 180, 0.16);
+}
+
+.swipe-hint-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.swipe-hint-title {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 0.82rem;
   font-weight: 700;
   color: var(--primary-pink);
-  box-shadow: 0 6px 14px rgba(255, 105, 180, 0.25);
-  cursor: pointer;
-  transition: transform 0.2s;
 }
 
-.candle-number:hover {
-  transform: scale(1.08);
+.candles-badge {
+  background: #fff0f5;
+  border: 1px solid #ffd1dc;
+  border-radius: 9999px;
+  padding: 2px 8px;
+  font-family: 'Fredoka', 'Quicksand', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #7a5761;
 }
 
-/* Фитиль и пламя */
-.candle-wick {
+.swipe-wind-track {
+  position: relative;
+  width: 100%;
+  height: 44px;
+  background: #fff8fa;
+  border: 1.5px solid #ffb6c1;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  cursor: grab;
+  touch-action: none;
+  overflow: hidden;
+  user-select: none;
+}
+
+.swipe-wind-track:active {
+  cursor: grabbing;
+}
+
+.swipe-wind-progress {
   position: absolute;
-  top: -8px;
-  width: 3px;
-  height: 8px;
-  background: #333;
-  border-radius: 2px;
-}
-
-.flame {
-  position: absolute;
-  top: -26px;
-  width: 16px;
-  height: 24px;
-  background: radial-gradient(ellipse at bottom, #fff 0%, #ffd700 40%, #ff4500 85%, transparent 100%);
-  border-radius: 50% 50% 20% 20%;
-  filter: drop-shadow(0 0 10px #ff9e00) drop-shadow(0 0 20px #ff4500);
-  animation: flicker 0.12s infinite alternate ease-in-out;
-  transform-origin: center bottom;
-  cursor: pointer;
-  transition: opacity 0.3s, transform 0.3s;
-}
-
-@keyframes flicker {
-  0% { transform: scale(1) rotate(-2deg); opacity: 0.95; }
-  100% { transform: scale(1.1, 0.9) rotate(3deg); opacity: 1; }
-}
-
-.flame.extinguished {
-  opacity: 0;
-  transform: scale(0.2) translateY(-10px);
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 10%;
+  background: linear-gradient(90deg, rgba(255,105,180,0.2), rgba(255,42,122,0.35));
+  border-radius: 9999px;
   pointer-events: none;
+  transition: width 0.05s linear;
 }
 
-.smoke-puff {
+.swipe-wind-knob {
   position: absolute;
-  top: -30px;
-  font-size: 1.5rem;
-  opacity: 0;
+  left: 3px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff69b4 0%, #ff2a7a 100%);
+  color: white;
+  border: 2px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  box-shadow: 0 4px 10px rgba(255, 42, 122, 0.4), inset 0 2px 0 rgba(255,255,255,0.6);
+  z-index: 5;
+  transition: transform 0.05s linear;
+}
+
+.swipe-wind-text {
+  width: 100%;
+  text-align: center;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #a46d8f;
   pointer-events: none;
-  animation: smokeRise 1.2s ease-out forwards;
+  padding-left: 20px;
 }
 
-@keyframes smokeRise {
-  0% { opacity: 0.9; transform: translateY(0) scale(0.6); }
-  100% { opacity: 0; transform: translateY(-40px) scale(1.8); }
-}
-
-.mic-status-box {
-  background: rgba(255, 255, 255, 0.92);
-  border: 1.5px solid var(--pastel-pink);
-  padding: 8px 18px;
+.wish-status-box {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid var(--primary-pink);
   border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--primary-pink);
-  margin-top: 10px;
-  box-shadow: 0 4px 12px rgba(255, 105, 180, 0.15);
+  padding: 10px 18px;
+  font-family: 'Fredoka', 'Quicksand', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ff1493;
+  margin-top: 12px;
+  box-shadow: 0 6px 18px rgba(255, 105, 180, 0.25);
+  animation: wishBoxBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes wishBoxBounce {
+  0% { transform: scale(0.85); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 /* ==========================================================================
